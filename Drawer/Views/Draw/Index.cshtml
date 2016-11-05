@@ -1,0 +1,105 @@
+﻿
+@{
+    ViewBag.Title = "MyChart";
+}
+<html>
+<head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script>
+        
+        $(document).ready(function () {
+            $('#update').on('click', draw);
+            
+            google.charts.load('current', { 'packages': ['line'] });
+            google.charts.setOnLoadCallback(draw);
+
+        });
+        
+        
+
+        function draw() {
+            debugger;
+            $('.pointval').remove();
+            var type = $('#Datetype').val();            
+            var length = ($('#Numberofpoints').val() == undefined) ? 0 : $('#Numberofpoints').val();
+          $.ajax({
+              url: "http://localhost:56827/api/chart/getpoints/" + length,
+              dataType: "json",
+              method: "GET",
+              success: function (points) {
+                  var data = new google.visualization.DataTable();
+                  data.addColumn('number', type);
+                  data.addColumn('number', 'line 1');
+                  data.addRows(points.length);
+                  $.each(points, function (key, value) {
+                      data.setCell(key,0,key+1);
+                  });
+                  $.each(points, function (key, value) {
+                      data.setCell(key, 1, value);
+                  });
+                  var content = '';
+                  $.each(points, function (key, value) {
+                      content += '<tr>' +
+                          '<td align="center" class="pointval">' + value + '</td>' +
+                          '</tr>';
+                  });
+                  $(content).insertAfter($('.MainTR'));
+                  
+                  
+                  var options = {
+                      chart: {
+                          title: 'Efficiency',
+                          subtitle: 'in ' + type
+                      },
+                      width: 900,
+                      height: 500
+                  };
+
+                  var chart = new google.charts.Line(document.getElementById('linechart_material'));
+
+                  chart.draw(data, options);
+              },
+              error: function () {
+                  alert(data);
+              }
+              
+          });
+         
+      }
+    </script>
+</head>
+<body>
+        <br />
+        <br />
+        <b>Раскрывающийся список</b>
+        @Html.DropDownList("Datetype",
+                        new SelectList(new[] { "Days", "Minutes" }))
+        <br />
+        <br />
+       <b>Количество точек:</b>    
+        @Html.TextBox("Numberofpoints")
+
+        <br /><br />
+        <button id="update"> Update</button>
+
+    <br />
+    <br />
+    <hr />
+    <div id="linechart_material" style="width: 900px; height: 500px"></div>
+    <hr />
+    
+    <table id="usedpoints" class="table">
+        <tr class="MainTR">
+             <td align="center">
+                Point
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>
+
+
+
+
