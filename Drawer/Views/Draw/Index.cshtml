@@ -19,7 +19,6 @@
  
         function draw() {
             debugger;
-            $('.pointval').remove();
             var type = $('#Datetype').val();            
             var length = ($('#Numberofpoints').val() == "") ? 1 : $('#Numberofpoints').val();
           $.ajax({
@@ -28,28 +27,27 @@
               method: "GET",
               success: function (points) {
                   var choosedType = points.type;
-
+                  var now = new Date();
                   var data = new google.visualization.DataTable();
-                  data.addColumn('number', choosedType);
+                  data.addColumn('string', choosedType);
                   data.addColumn('number', 'line');
                   data.addRows(points.array.length);
-                  $.each(points.array, function (key, value) {
-                      data.setCell(key,0,key+1);
-                  });
-                  $.each(points.array, function (key, value) {
-                      data.setCell(key, 1, value);
-                  });
-                  var content = '';
-                  if (points.array.length != 1) {
+                  if (choosedType == 'Days') {
                       $.each(points.array, function (key, value) {
-                          content += '<tr>' +
-                              '<td align="center" class="pointval">' + value + '</td>' +
-                              '</tr>';
+                          data.setCell(key, 0, now.getDate() + '/' + now.getMonth());
+                          now.setDate(now.getDate() + 1);
+                      });
+                  }
+                  if (choosedType == 'Minutes') {
+                      $.each(points.array, function (key, value) {
+                          data.setCell(key, 0, now.getHours() + ':' + now.getMinutes());
+                          now.setHours(now.getHours() + 1);
                       });
                   }
                   
-                  $(content).insertAfter($('.MainTR'));
-                  
+                  $.each(points.array, function (key, value) {
+                      data.setCell(key, 1, value);
+                  });
                   
                   var options = {
                       chart: {
@@ -90,16 +88,8 @@
     <br />
     <br />
     <hr />
-    <div id="linechart_material" style="width: 900px; height: 500px"></div>
+    <div id="linechart_material" style="width: 1300px; height: 500px"></div>
     <hr />
-    
-    <table id="usedpoints" class="table">
-        <tr class="MainTR">
-             <td align="center">
-                Point
-            </td>
-        </tr>
-    </table>
 
 </body>
 </html>
