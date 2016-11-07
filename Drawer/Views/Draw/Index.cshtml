@@ -16,41 +16,45 @@
 
         });
         
-        
-
+ 
         function draw() {
             debugger;
             $('.pointval').remove();
             var type = $('#Datetype').val();            
-            var length = ($('#Numberofpoints').val() == undefined) ? 0 : $('#Numberofpoints').val();
+            var length = ($('#Numberofpoints').val() == "") ? 1 : $('#Numberofpoints').val();
           $.ajax({
-              url: "http://localhost:56827/api/chart/getpoints/" + length,
+              url: "/api/chart/getpoints/" + length + "," + type,
               dataType: "json",
               method: "GET",
               success: function (points) {
+                  var choosedType = points.type;
+
                   var data = new google.visualization.DataTable();
-                  data.addColumn('number', type);
-                  data.addColumn('number', 'line 1');
-                  data.addRows(points.length);
-                  $.each(points, function (key, value) {
+                  data.addColumn('number', choosedType);
+                  data.addColumn('number', 'line');
+                  data.addRows(points.array.length);
+                  $.each(points.array, function (key, value) {
                       data.setCell(key,0,key+1);
                   });
-                  $.each(points, function (key, value) {
+                  $.each(points.array, function (key, value) {
                       data.setCell(key, 1, value);
                   });
                   var content = '';
-                  $.each(points, function (key, value) {
-                      content += '<tr>' +
-                          '<td align="center" class="pointval">' + value + '</td>' +
-                          '</tr>';
-                  });
+                  if (points.array.length != 1) {
+                      $.each(points.array, function (key, value) {
+                          content += '<tr>' +
+                              '<td align="center" class="pointval">' + value + '</td>' +
+                              '</tr>';
+                      });
+                  }
+                  
                   $(content).insertAfter($('.MainTR'));
                   
                   
                   var options = {
                       chart: {
                           title: 'Efficiency',
-                          subtitle: 'in ' + type
+                          subtitle: 'in ' + choosedType
                       },
                       width: 900,
                       height: 500
@@ -60,8 +64,8 @@
 
                   chart.draw(data, options);
               },
-              error: function () {
-                  alert(data);
+              error: function (data) {
+                  alert(data.responseText);
               }
               
           });

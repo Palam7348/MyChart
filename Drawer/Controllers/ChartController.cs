@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Routing;
 using System.Web.Http.Cors;
+using Drawer.Models;
 
 namespace Drawer.Controllers
 {
@@ -18,14 +19,16 @@ namespace Drawer.Controllers
         {
             try
             {
+                string[] listOfParams = id.Split(',');
                 List<int> list = new List<int>();
-                int count = int.Parse(id);
+                int count = int.Parse(listOfParams[0]);
                 Random rand = new Random();
                 for (int i = 0; i < count; i++)
                  {
                       list.Add(rand.Next(1, 99));
                  }
-                 return Request.CreateResponse(HttpStatusCode.OK, list); 
+                Pack pack = new Pack { array = list, type = listOfParams[1] };
+                 return Request.CreateResponse(HttpStatusCode.OK, pack); 
             }
             catch (Exception e)
             {
