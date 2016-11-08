@@ -7,7 +7,8 @@ namespace Drawer.Models
 {
     public class Pack
     {
-        public List<int> array { get; set; }
-        public string type { get; set; }
+        public List<string> XLine { get; set; }
+        public List<int> FirstLine { get; set; }
+        public string Type { get; set; }
     }
 }

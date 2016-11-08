@@ -25,27 +25,18 @@
               url: "/api/chart/getpoints/" + length + "," + type,
               dataType: "json",
               method: "GET",
-              success: function (points) {
-                  var choosedType = points.type;
-                  var now = new Date();
+              success: function (pack) {
+                  var choosedType = pack.Type;
                   var data = new google.visualization.DataTable();
                   data.addColumn('string', choosedType);
                   data.addColumn('number', 'line');
-                  data.addRows(points.array.length);
-                  if (choosedType == 'Days') {
-                      $.each(points.array, function (key, value) {
-                          data.setCell(key, 0, now.getDate() + '/' + now.getMonth());
-                          now.setDate(now.getDate() + 1);
-                      });
-                  }
-                  if (choosedType == 'Minutes') {
-                      $.each(points.array, function (key, value) {
-                          data.setCell(key, 0, now.getHours() + ':' + now.getMinutes());
-                          now.setHours(now.getHours() + 1);
-                      });
-                  }
+                  data.addRows(pack.XLine.length);
+                  // The X axis
+                  $.each(pack.XLine, function (key, value) {
+                      data.setCell(key, 0, value);
+                  });
                   
-                  $.each(points.array, function (key, value) {
+                  $.each(pack.FirstLine, function (key, value) {
                       data.setCell(key, 1, value);
                   });
                   
@@ -54,7 +45,7 @@
                           title: 'Efficiency',
                           subtitle: 'in ' + choosedType
                       },
-                      width: 900,
+                      width: 1200,
                       height: 500
                   };
 

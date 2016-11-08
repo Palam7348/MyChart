@@ -20,14 +20,35 @@ namespace Drawer.Controllers
             try
             {
                 string[] listOfParams = id.Split(',');
+                DateTime now = DateTime.Now;
                 List<int> list = new List<int>();
+                List<string> XLine = new List<string>();
                 int count = int.Parse(listOfParams[0]);
                 Random rand = new Random();
+                string choosedType = listOfParams[1];
                 for (int i = 0; i < count; i++)
                  {
                       list.Add(rand.Next(1, 99));
                  }
-                Pack pack = new Pack { array = list, type = listOfParams[1] };
+                if (choosedType == "Days")
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        XLine.Add(now.Day + "/" + now.Month);
+                        now = now.AddDays(1);
+                    }
+                }
+                if (choosedType == "Minutes")
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        XLine.Add(now.Hour + ":" + now.Minute);
+                        now = now.AddHours(1);
+                    }
+                }
+
+
+                Pack pack = new Pack { XLine = XLine, FirstLine = list, Type = choosedType };
                  return Request.CreateResponse(HttpStatusCode.OK, pack); 
             }
             catch (Exception e)
